@@ -9,8 +9,27 @@ export default createStore({
     loansLoaded: null,
     currentLoanArray: null,
     editLoan: null,
+    user: {
+      loggedIn: false,
+      data: null
+    },
+  },
+  getters: {
+    user(state){
+      return state.user;
+    }
   },
   mutations: {
+    //
+    SET_LOGGED_IN(state, value){
+      state.user.loggedIn = value;
+    },
+    SET_USER(state, data) {
+      state.user.data = data;
+
+    },
+   
+    //
     TOGGLE_LOAN(state) {
       state.loanModal = !state.loanModal;
     },
@@ -53,18 +72,31 @@ export default createStore({
     },
   },
   actions: {
+    //
+    fetchUser({ commit }, user) {
+      commit("SET_LOGGED_IN", user !== null);
+      if( user ){
+        commit("SET_USER", {
+          displayName: user.displayName,
+          
+          email: user.email
+        });
+      }
+      else {
+        commit("SET_USER", null);
+      }
+    },
+  
+    //
     async GET_LOANS({commit, state}){
-      const getData = db.collection("loans"); // change name
+      const getData = db.collection("loans");
       const results = await getData.get();
       results.forEach(doc => {
         if(!state.loanData.some((loan) => loan.docId === doc.id)) {
           const data = {
             docId: doc.id,
+            created: doc.data().created,
             loanId: doc.data().loanId,
-            // billerStreetAddress: doc.data().billerStreetAddress,
-            // billerCity: doc.data().billerCity,
-            // billerZipCode: doc.data().billerZipCode,
-            // billerCountry: doc.data().billerCountry,
             clientName: doc.data().clientName,
             clientEmail: doc.data().clientEmail,
             clientStreetAddress: doc.data().clientStreetAddress,
@@ -77,7 +109,6 @@ export default createStore({
             paymentDueDateUnix: doc.data().paymentDueDateUnix,
             paymentDueDate: doc.data().paymentDueDate,
             productDescription: doc.data().productDescription,
-            // loanItemList: doc.data().loanItemList,
             loanTotal: doc.data().loanTotal,
             loanPending: doc.data().loanPending,
             loanDraft: doc.data().loanDraft,

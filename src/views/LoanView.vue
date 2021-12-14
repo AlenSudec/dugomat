@@ -126,7 +126,7 @@ export default {
     }
     .header,
     .loan-details {
-      background-color: #1e2139;
+      background-color: #393E46;
       border-radius: 20px;
     }
     .header {
@@ -144,6 +144,9 @@ export default {
       .right {
         flex: 1;
         justify-content: flex-end;
+        .dark-purple {
+          background: #222831;
+        }
         .button {
           color: #fff;
         }
@@ -156,9 +159,16 @@ export default {
        .total {
           color: #fff;
           padding: 32px;
-          background-color: rgba(12, 14, 22, 0.7);
-          align-items: center;
-          border-radius: 0 0 20px 20px;
+          background-color: #D65A31;
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          gap: 50px;
+          border-radius: 20px 20px 20px 20px;
+          margin-top: 20px;
+          p {
+            font-size: 28px;
+          }
        }
       .top {
         div {
@@ -180,7 +190,7 @@ export default {
           }
 
           span {
-            color: #888eb0;
+            color: #D65A31;
           }
         }
         .right {
@@ -191,8 +201,9 @@ export default {
 
       .middle {
         margin-top: 50px;
+        margin-bottom: 20px;
         color: #dfe3fa;
-        gap: 16px;
+        gap: 100px;
 
         h4 {
           font-size: 12px;

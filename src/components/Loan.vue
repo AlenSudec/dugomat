@@ -1,6 +1,7 @@
 <template>
-  <router-link class="loan flex" :to="{name: 'Loan', params: { loanId: loan.loanId }}">
+  <router-link v-if="userMail==loan.created" class="loan flex" :to="{name: 'Loan', params: { loanId: loan.loanId }}">
       <div class="left flex">
+          <!-- <span>{{loan.created}}</span> -->
           <span class="tracking-number">#{{loan.loanId}}</span>
           <span class="due-date">{{loan.paymentDueDate}}</span>
           <span class="person">{{loan.clientName}}</span>
@@ -17,14 +18,30 @@
           </div>
       </div>
   </router-link>
+  
 </template>
 
 <script>
+import {mapGetters } from "vuex";
+import store from "../store/index";
 export default {
     name: "loan",
     props: ["loan"],
-    ///HOWWWWWWWWWWWWWWWWW
-}
+    data : function() {
+        return {
+            userMail: store.state.user.data.email
+        }
+    },
+    computed: {
+
+        ...mapGetters({
+            user: "user"
+        }),
+        
+    },
+    
+};
+
 </script>
 <style lang="scss" scoped>
 .loan{
@@ -35,7 +52,7 @@ export default {
     color: #fff;
     border-radius: 20px;
     padding: 28px 32px;
-    background-color: #1e2139;
+    background-color: #393E46;
     align-items: center;
     span {
         font-size: 13px;

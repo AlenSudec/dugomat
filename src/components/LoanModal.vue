@@ -8,17 +8,18 @@
         <Loading v-show="loading"/>
       <h1 v-if="!editLoan">Nova posudba</h1>
       <h1 v-else>Uredi posudbu</h1>
+      <h1>Korisnik: {{user.data.email}}</h1>
 
       <!-- borrower -->
       <div class="bill-to flex flex-column">
         <h4>Osoba koja posuđuje</h4>
         <div class="input flex flex-column">
-          <label for="clientName">Ime</label>
-          <input required type="text" id="clientName" v-model="clientName" />
+          <label for="clientName">Ime i prezime</label>
+          <input required type="text" id="clientName" v-model="clientName" placeholder="Pero Perić"/>
         </div>
         <div class="input flex flex-column">
           <label for="clientEmail">E-mail</label>
-          <input required type="text" id="clientEmail" v-model="clientEmail" />
+          <input required type="text" id="clientEmail" v-model="clientEmail" placeholder="pero@gmail.com"/>
         </div>
         <div class="input flex flex-column">
           <label for="clientStreetAddress">Adresa</label>
@@ -27,12 +28,13 @@
             type="text"
             id="clientStreetAddress"
             v-model="clientStreetAddress"
+            placeholder="Ulica Pere 18"
           />
         </div>
         <div class="location-details flex">
           <div class="input flex flex-column">
             <label for="clientCity">Grad</label>
-            <input required type="text" id="clientCity" v-model="clientCity" />
+            <input required type="text" id="clientCity" v-model="clientCity" placeholder="Zagreb"/>
           </div>
         </div>
       </div>
@@ -46,6 +48,7 @@
               disabled
               type="text"
               id="loanDate"
+              
               v-model="loanDate"
             />
           </div>
@@ -55,13 +58,14 @@
               disabled
               type="text"
               id="paymentDueDate"
+              placeholder="xx/xx/xxxx"
               v-model="paymentDueDate"
             />
           </div>
         </div>
         <div class="input flex flex-column">
           <label for="paymentTerms">Iznos roka za plaćanje (u danima)</label>
-          <input type="number" id="paymentTerms" v-model="paymentTerms">
+          <input type="number" id="paymentTerms" v-model="paymentTerms" placeholder="7">
         </div>
         <div class="input flex flex-column">
           <label for="productDescription">Opis posudbe</label>
@@ -103,14 +107,16 @@
 </template>
 
 <script>
-import { mapMutations, mapState, mapActions } from "vuex";
+import { mapMutations, mapState, mapActions, mapGetters } from "vuex";
 import { uid } from "uid";
 import db from "../firebase/firebaseInit";
 import Loading from "../components/Loading.vue";
+import store from "../store/index";
 export default {//name change
   name: "loanModal",
   data() {
     return {
+        created : null,
         dateOptions: { year: "numeric", month: "short", day: "numeric"},
         docId: null,
         loading: null,
@@ -155,8 +161,6 @@ export default {//name change
       this.loanDraft = currentLoan.loanDraft;
       this.loanTotal = currentLoan.loanTotal;
     }
-    
-
   },
   components: {
       Loading,
@@ -167,6 +171,7 @@ export default {//name change
       ...mapActions(["UPDATE_LOAN","GET_LOANS"]),
 
       checkClick(e) {
+          
           if(e.target === this.$refs.loanWrap){
               this.TOGGLE_MODAL();
           }
@@ -202,21 +207,24 @@ export default {//name change
 
         const dataBase = db.collection("loans").doc(); // change db
         await dataBase.set({
-            loanId: uid(6),
-            clientName: this.clientName,
-            clientEmail: this.clientEmail,
-            clientStreetAddress: this.clientStreetAddress,
-            clientCity: this.clientCity,
-            loanDate: this.loanDate,
-            loanDateUnix: this.loanDateUnix,
-            paymentTerms: this.paymentTerms,
-            paymentDueDate: this.paymentDueDate,
-            paymentDueDateUnix: this.paymentDueDateUnix,
-            productDescription: this.productDescription,
-            loanTotal: this.loanTotal,
-            loanPending: this.loanPending,
-            loanDraft: this.loanDraft,
-            loanPaid: null,
+          
+          created: store.state.user.data.email,
+          loanId: uid(6),
+          clientName: this.clientName,
+          clientEmail: this.clientEmail,
+          clientStreetAddress: this.clientStreetAddress,
+          clientCity: this.clientCity,
+          loanDate: this.loanDate,
+          loanDateUnix: this.loanDateUnix,
+          paymentTerms: this.paymentTerms,
+          paymentDueDate: this.paymentDueDate,
+          paymentDueDateUnix: this.paymentDueDateUnix,
+          productDescription: this.productDescription,
+          loanTotal: this.loanTotal,
+          loanPending: this.loanPending,
+          loanDraft: this.loanDraft,
+          loanPaid: null,
+          
         });
 
         this.loading = false;
@@ -261,6 +269,10 @@ export default {//name change
   },
   computed : {
     ...mapState(["editLoan","currentLoanArray"]),
+    ...mapGetters({
+      user: "user"
+    }),
+    
   },
   watch: {
       paymentTerms() {
@@ -270,6 +282,7 @@ export default {//name change
       }
   }
 };
+
 </script>
 <style lang="scss" scoped>
 .loan-wrap {
@@ -280,11 +293,12 @@ export default {//name change
   width: 100%;
   height: 100vh;
   overflow: scroll;
+  z-index: 1;
   &::-webkit-scrollbar {
       display: none;
   }
   @media (min-width: 900px) {
-    left: 90px;
+    left: 0px;
   }
 
   .loan-content {
@@ -292,22 +306,28 @@ export default {//name change
     padding: 56px;
     max-width: 700px;
     width: 100%;
-    background-color: #141625;
+    z-index: 2;
+    background-color: #2f3846;
     color: #fff;
     box-shadow: 10px 4px 6px -1px rgba(0, 0, 0, 0.2),
       0 2px 4px -1px rgba(0, 0, 0, 0.06);
     h1 {
-      margin-bottom: 48px;
+      margin-bottom: 32px;
       color: #fff;
+      font-size: 26px;
+      &:nth-child(3){
+        font-size: 15px;
+      }
     }
+    
     h3 {
       margin-bottom: 16px;
       font-size: 18px;
       color: #777f98;
     }
     h4 {
-      color: #7c5dfa;
-      font-size: 12px;
+      color: #FFFFFF;
+      font-size: 20px;
       margin-bottom: 24px;
     }
     // Bill To / Bill From
@@ -389,11 +409,18 @@ export default {//name change
   }
   .save {
     margin-top: 60px;
-    div {
-      flex: 1;
+    justify-content: space-between;
     }
+    div {
+      
     .right {
       justify-content: flex-end;
+      .dark-purple {
+        background: #393E46;
+      }
+      .purple {
+        background: #D65A31;
+      }
     }
   }
 
@@ -406,12 +433,18 @@ export default {//name change
   }
   input,
   select {
+    background: #2f3846;
     width: 100%;
-    background-color: #1e2139;
     color: #fff;
     border-radius: 4px;
     padding: 12px 4px;
     border: none;
+    border-bottom: 2px solid #FFFFFF;
+    &:focus {
+                    outline: none;
+                    border-bottom: 2px solid #FFFFFF;
+                }
+
 
     &:focus {
       outline: none;

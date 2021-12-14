@@ -42,16 +42,21 @@ export default {
   height: 100vh;
   width: 100%;
   .modal-content {
+    border: 1px solid #FFFFFF;
     border-radius: 20px;
     padding: 48px 32px;
     max-width: 450px;
-    background-color: #252945;
+    background-color: #222831;
     color: #fff;
     p {
       text-align: center;
     }
     .actions {
       margin-top: 24px;
+      
+      .purple {
+        background-color: #D65A31;
+      }
       button {
         flex: 1;
       }

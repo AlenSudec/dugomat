@@ -2,16 +2,17 @@
   <div class="home container">
     <!-- Header -->
     <div class="header flex">
+      
       <div class="left flex flex-column">
         <h1>Posudbe</h1>
-        <span v-if="loanData.length==1">Imate {{ loanData.length }} aktivnu posudbu</span>
+        <!-- <span v-if="loanData.length==1">Imate {{ loanData.length }} aktivnu posudbu</span>
         <span v-else-if="loanData.length > 1 && loanData.length < 5">Imate {{ loanData.length }} aktivne posudbe</span>
-        <span v-else>Imate {{ loanData.length }} aktivnih posudbi</span>
+        <span v-else>Imate {{ loanData.length }} aktivnih posudbi</span> -->
       </div>
       <div class="right flex">
         <div @click="toggleFilterMenu" class="filter flex">
           <span>Filtriraj po statusu <span v-if="filteredLoan">: {{ filteredLoan }}</span></span>
-          <img src="@/assets/icon-arrow-down.svg" alt="">
+          <img class="down-arrow" src="@/assets/icon-arrow-down.svg" alt="">
           <ul v-show="filterMenu" class="filter-menu">
             <li @click="filteredLoans">U pripremi</li>
             <li @click="filteredLoans">Neplaćeno</li>
@@ -28,26 +29,44 @@
       </div>
     </div>
     <!-- loans -->
-    <div v-if="loanData.length > 0">
-      <Loan v-for="(loan,index) in filteredData" v-bind:loan="loan" :key="index"/>
+    <!-- <div v-for="item in (loanData.length-1)" v-bind:key="item" v-bind:value="ima">
+      {{ loanData[item].created}}
+      <div v-if="loanData[item].created==userMail">
+        ima
+      </div>
+      
+      loanData[item].created
+    </div> -->
+
+    <div v-if=" loanData.length > 0">
+    <!-- <div v-if="userMail == loanData.loan.created"> -->
+      <div class="hidden">Nemate unesenih posudbi. Klikom na gumb "Nova posudba" stvarate novu posudbu</div>
+      <Loan class="loans" v-for="(loan,index) in filteredData" v-bind:loan="loan" :key="index"/>
+      
     </div>
+    
     <div v-else class="empty flex flex-column">
       <img src="@/assets/illustration-empty.svg" alt="">
       <h3>Nemate upisanih posudbi</h3>
       <p>Stvori novu posudbu klikom na gumb Nova posudba</p>
     </div>
+    
   </div>
 </template>
 
 <script>
-import { mapMutations, mapState } from "vuex";
+
+import { mapMutations, mapState, mapGetters } from "vuex";
 import Loan from "../components/Loan.vue";
+import store from "../store/index";
 export default {
   name: "Home",
   data() {
     return {
       filterMenu: null,
       filteredLoan: null,
+      userMail: store.state.user.data.email,
+      ima: null,
     }
   },
   components: {
@@ -70,8 +89,11 @@ export default {
     }
   },
   computed: {
+    
     ...mapState(["loanData"]),
-
+    ...mapGetters({
+      user: "user"
+    }),
     filteredData() {
       return this.loanData.filter(loan => {
         if(this.filteredLoan === "U pripremi") {
@@ -88,9 +110,20 @@ export default {
     }
   }
 };
+
 </script>
 
 <style lang="scss" scoped>
+.hidden {
+  position: absolute;
+  margin-left: 50px;
+  z-index: 0;
+  text-align: center;
+}
+.loans {
+  position: relative;
+  z-index: 1;
+}
 .home {
   color: #fff;
   .header {
@@ -118,6 +151,7 @@ export default {
             margin-left: 12px;
             width: 9px;
             height: 5px;
+            color: #FFFFFF;
           }
 
           .filter-menu {
@@ -144,7 +178,7 @@ export default {
 
       .button {
         padding: 8px 10px;
-        background-color: #7c5dfa;
+        background-color: #D65A31;
         border-radius: 40px;
 
         .inner-button {
