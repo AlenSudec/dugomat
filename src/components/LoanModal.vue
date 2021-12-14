@@ -293,7 +293,7 @@ export default {//name change
   width: 100%;
   height: 100vh;
   overflow: scroll;
-  z-index: 1;
+  z-index: 3;
   &::-webkit-scrollbar {
       display: none;
   }
